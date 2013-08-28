@@ -4,7 +4,7 @@
 
 #define TAP_BUFFER_SIZE 1500
 
-int umip_open_tap(char *);
+int umip_open_tap(char *tapname);
 
 #endif // _UMIP_UTAP_H_
 

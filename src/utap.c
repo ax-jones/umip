@@ -22,9 +22,7 @@ int umip_open_tap(char *ifname)
 
   memset(&ifr, 0, sizeof(ifr));
 
-  ifr.ifr_flags = IFF_TAP;
-
-  strncpy(ifr.ifr_name, ifname, IFNAMSIZ);
+  ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
 
   if((err = ioctl(fd, TUNSETIFF, (void*) &ifr)) < 0) {
     perror("tap interface setiff failed");
