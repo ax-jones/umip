@@ -8,6 +8,7 @@
 typedef uint16_t IpPort;
 
 typedef struct {
+  MacHeader mac;
   uint8_t cVersion;
   uint8_t cTos;
   uint16_t wTotalLen;
@@ -57,8 +58,15 @@ typedef struct {
 
 #define IPV4_ADDR_NULL 0x0;
 
-void iph_init(IpHost *, MacDevice *mdev);
-uint8_t iph_proc(IpHost *);
-void iph_set_ip4addr(IpHost *, Ip4Addr, Ip4Addr);
+void iph_init(IpHost *iph, MacDevice *mdev);
+uint8_t iph_proc(IpHost *iph);
+uint8_t iph_handle_msg(IpHost *iph);
+void iph_set_ip4addr(IpHost *, Ip4Addr localAddr, Ip4Addr netmask);
+
+IpHeader *iph_get_ip_header(MacFrame *mf);
+IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest);
+
+uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len);
+uint8_t udp_handle_msg(IpHost *iph);
 
 #endif // _UMIP_IP_H_

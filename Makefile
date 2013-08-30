@@ -8,6 +8,7 @@ $(SUBDIRS):
 
 clean:
 	@for dir in $(SUBDIRS); do (cd $$dir; $(MAKE) clean); done
+	rm umip.elf
 
 all: $(SUBDIRS)
 

@@ -3,8 +3,8 @@ all: umip.elf
 
 TARGET := umip.elf
 
-INCLUDES := utap.h mac.h common.h arp.h ip.h
-LIBOBJS := main.o common.o utap.o mac.o arp.o ip.o
+INCLUDES := utap.h mac.h common.h arp.h ip.h tcp.h icmp.h
+LIBOBJS := main.o common.o utap.o mac.o arp.o ip.o tcp.o icmp.o
 
 CFLAGS += -fms-extensions
 
