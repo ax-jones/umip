@@ -55,6 +55,13 @@ uint8_t arp_get_addr(ArpHandler *ah, MacAddr macaddr, Ip4Addr ipaddr)
   return 0;
 }
 
+uint8_t arp_has_addr(ArpHandler *ah, Ip4Addr ipaddr)
+{
+  MacAddr ma;
+
+  return arp_get_addr(ah, ma, ipaddr);
+}
+
 void arp_add_entry(ArpHandler *ah, MacAddr macaddr, Ip4Addr ipaddr)
 {
   if(ah->nentries < ARP_ENTRIES) {
@@ -62,6 +69,7 @@ void arp_add_entry(ArpHandler *ah, MacAddr macaddr, Ip4Addr ipaddr)
     _memcpy(ah->table[ah->nentries].macAddr, macaddr, MAC_ADDR_LEN);
     ah->nentries++;
   }
+  dout("Adding arp entry %i for %x.\n", ah->nentries, ipaddr);
 }
 
 void arp_send_request(ArpHandler *ah, Ip4Addr ipaddr)

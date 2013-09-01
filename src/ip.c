@@ -66,8 +66,8 @@ IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest)
 
   MacAddr destMac;
 
-  if(!arp_get_addr(&iph->arph, destMac, iph->localAddr)) {
-    dout("Can't find mac.\n");
+  if(!arp_get_addr(&iph->arph, destMac, dest)) {
+    dout("Can't find mac for %x.\n", dest);
     return NULL;
   }
 
@@ -75,10 +75,27 @@ IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest)
 
   iphead->cVersion = IP_VERS_IPV4;
   iphead->cTos = 0;
-  iphead->cTTL = 255;
-  iphead->srcAddr = iph->localAddr;
+  iphead->cTTL = 64;
+  iphead->srcAddr = HTONL(iph->localAddr);
   iphead->destAddr = dest;
   iphead->wFragmentOff = 0;
+  iphead->wIndent = 0;
+
+  return iphead;
+}
+
+void iph_finish_frame(MacFrame *mf, IpHeader *iphead, uint16_t len)
+{
+  iphead->wHdrChecksum = 0;
+  iphead->wTotalLen = HTONS((20 + len));
+
+  uint8_t *ipp = (uint8_t*) iphead;
+  ipp += sizeof(MacHeader);
+  iphead->wHdrChecksum = ip_calc_csum((uint16_t*)ipp, sizeof(IpHeader) - sizeof(MacHeader));
+
+  mf->writePtr = len + sizeof(IpHeader);
+
+  dout("checksum for iph %hx.\n", iphead->wHdrChecksum);
 }
 
 uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len)
@@ -89,11 +106,11 @@ uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len)
     sum += *(ptr++);
     len -= 2;
   }
-  if(len) sum += *(uint8_t*)ptr;
+  if(len) sum += *ptr & 0xff;
 
   while(sum >> 16) sum = (sum & 0xffff) + (sum >> 16);
 
-  return ~sum;
+  return ~(uint16_t)(sum);
 }
 
 uint8_t udp_handle_msg(IpHost *iph)

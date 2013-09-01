@@ -10,7 +10,7 @@
 #include <linux/if.h>
 #include <linux/if_tun.h>
 #include "utap.h"
-#include "ip.h"
+#include "icmp.h"
 
 void usage(const char *appName) { fprintf(stderr, "Usage: %s <if name>\n", appName); };
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-  printf("Interface %s opened %lu.\n", ifname, sizeof(MacHeader));
+  printf("Interface %s opened %lu %i %i %i.\n", ifname, sizeof(MacHeader), sizeof(IpHeader), sizeof(IcmpHeader), 0);
 
   if(argc == 2) {
     outfd = open(argv[1], O_CREAT | O_WRONLY | O_APPEND, S_IRUSR | S_IRGRP | S_IROTH);
@@ -58,10 +58,13 @@ int main(int argc, char **argv)
     uint8_t *ra = mac_frame_header(&mdev.recvFrame)->srcAddr;
     printf("Pkt %i read from 0x%hhx%hhx%hhx%hhx%hhx%hhx %hx 0x%02hhx%02hhx%02hhx%02hhx.\n", mac_payload_len(&mdev.recvFrame), ra[0], ra[1], ra[2], ra[3], ra[4], ra[5], NTOHS(mac_frame_header(&mdev.recvFrame)->wType), pktbuff[0], pktbuff[1], pktbuff[2], pktbuff[3]);
 
+    _memset(mdev.sendFrame.packet, 0, TAP_BUFFER_SIZE);
+
     if(iph_proc(&iph)) {
       dout("we write something %hi.\n", mac_payload_len(&mdev.sendFrame));
-      memcpy(outbuff, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
-      write(tapfd, outbuff, mdev.sendFrame.writePtr);
+      //memcpy(outbuff, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
+      write(tapfd, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
+      mac_clear_frame(&mdev.sendFrame);
     }
     if(outfd > 0) {
       snprintf(pktlabel, 16, "\n%i:\n", mac_payload_len(&mdev.recvFrame));

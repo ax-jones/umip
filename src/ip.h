@@ -22,15 +22,15 @@ typedef struct {
   // uint32_t dIPOption;
 } __attribute__((packed)) IpHeader;
 
-#define IP_VERS_IPV4 0x40
+#define IP_VERS_IPV4 0x45
 #define IP_VERS_IPV6 0x60
 
 #define IP_HEADER_LEN 0x04
 
 #define IP_DSF_DEFAULT 0x00
 
-#define IP_FLAGS_MORE_FRAGMENTS 0x20
-#define IP_FLAGS_DONT_FRAGMENT 0x40
+#define IP_FLAGS_MORE_FRAGMENTS 0x8000
+#define IP_FLAGS_DONT_FRAGMENT 0x4000
 
 #define IP_PROTO_ICMP 0x01
 #define IP_PROTO_TCP 0x06
@@ -65,8 +65,10 @@ void iph_set_ip4addr(IpHost *, Ip4Addr localAddr, Ip4Addr netmask);
 
 IpHeader *iph_get_ip_header(MacFrame *mf);
 IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest);
+void iph_finish_frame(MacFrame *mf, IpHeader *iphead, uint16_t len);
 
 uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len);
+
 uint8_t udp_handle_msg(IpHost *iph);
 
 #endif // _UMIP_IP_H_
