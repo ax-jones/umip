@@ -25,5 +25,5 @@ $(LIBTARGET): $(LIBOBJS)
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	rm -f $(LIBOBJS) $(TARGET) $(LIBTARGET)
+	rm -f $(LIBOBJS) $(TARGET) $(LIBTARGET) $(TAPOBJS)
 

@@ -97,12 +97,19 @@ typedef struct {
   uint16_t urgentPtr;
 } __attribute__((packed)) TcpHeader;
 
+#define TCP_FIN 0x01
+#define TCP_SYN 0x02
+#define TCP_RST 0x04
+#define TCP_ACK 0x10
+
+enum { tcpVoid, tcpListen, tcpSynSent, tcpSynReceived, tcpEstablished, tcpFinWait1, tcpFinWait2, tcpCloseWait, tcpClosing, tcpLastAck, tcpTimeWait, tcpClosed };
+
 uint8_t tcp_handle_msg(IpHost *);
 
-void tcp_init_hdr(TcpHeader *tcph, Ip4Addr srcAddr, IpPort srcPort, Ip4Addr destAddr, IpPort destPort);
+TcpHeader *tcp_init_head(IpHost *iph, TcpSession *tcps, TcpHeader *tcph);
 void tcp_finish_frame(MacFrame *mf, TcpHeader *tcph, uint16_t len);
 
-void tcp_create_session(IpHost *iph, Ip4Addr destAddr, IpPort destPort);
+TcpSession *tcp_create_session(IpHost *iph, Ip4Addr destAddr, IpPort destPort);
 void tcp_send_ack(IpHost *iph, TcpSession *tcps);
 void tcp_handle_frame(IpHost *iph, TcpHeader *tcph);
 void tcp_close_session(IpHost *iph, TcpSession *tcps);

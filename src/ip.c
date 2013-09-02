@@ -9,6 +9,9 @@ void iph_init(IpHost *iph, MacDevice *mdev)
   iph->localAddr = IPV4_ADDR_NULL;
   iph->gatewayAddr = IPV4_ADDR_NULL;
   iph->netmask = 32;
+  iph->nSessions = 0;
+  uint8_t i = 0;
+  while(i < 8) iph->tcpSessions[i++].sessionState = tcpVoid;
 
   arp_init(&iph->arph, mdev);
 }
