@@ -46,7 +46,16 @@ uint16_t wLength;
 uint16_t wChecksum;
 } __attribute__((packed)) UdpHeader;
 
-void udp_init_hdr(UdpHeader *uph, IpPort srcPort, IpPort destPort, uint16_t len, uint16_t checksum);
+void udp_init_hdr(UdpHeader *uph, Ip4Addr srcAddr, IpPort srcPort, Ip4Addr destAddr, IpPort destPort);
+
+typedef struct {
+  Ip4Addr remoteAddr;
+  IpPort remotePort;
+  IpPort localPort;
+  uint32_t localSeqNumber;
+  uint32_t remoteSeqNumber;
+  uint8_t sessionState;
+} __attribute__((packed)) TcpSession;
 
 typedef struct {
   Ip4Addr localAddr;
@@ -54,6 +63,8 @@ typedef struct {
   uint8_t netmask;
   MacDevice *mdev;
   ArpHandler arph;
+  TcpSession tcpSessions[8];
+  uint8_t nSessions;
 } IpHost;
 
 #define IPV4_ADDR_NULL 0x0;
@@ -72,5 +83,23 @@ void iph_finish_frame(MacFrame *mf, IpHeader *iphead, uint16_t len);
 uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len);
 
 uint8_t udp_handle_msg(IpHost *iph);
+
+typedef struct {
+  IpHeader ipHead;
+  IpPort srcPort;
+  IpPort destPort;
+  uint32_t seqNumber;
+  uint32_t ackNumber;
+  uint8_t offset;
+  uint8_t tcpFlags;
+  uint16_t window;
+  uint16_t tcpChecksum;
+  uint16_t urgentPtr;
+} __attribute__((packed)) TcpHeader;
+
+uint8_t tcp_handle_msg(IpHost *);
+
+void tcp_init_hdr(TcpHeader *tcph, Ip4Addr srcAddr, IpPort srcPort, Ip4Addr destAddr, IpPort destPort);
+void tcp_finish_frame(MacFrame *mf, TcpHeader *tcph, uint16_t len);
 
 #endif // _UMIP_IP_H_
