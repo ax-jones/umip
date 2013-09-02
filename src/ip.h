@@ -102,4 +102,12 @@ uint8_t tcp_handle_msg(IpHost *);
 void tcp_init_hdr(TcpHeader *tcph, Ip4Addr srcAddr, IpPort srcPort, Ip4Addr destAddr, IpPort destPort);
 void tcp_finish_frame(MacFrame *mf, TcpHeader *tcph, uint16_t len);
 
+void tcp_create_session(IpHost *iph, Ip4Addr destAddr, IpPort destPort);
+void tcp_send_ack(IpHost *iph, TcpSession *tcps);
+void tcp_handle_frame(IpHost *iph, TcpHeader *tcph);
+void tcp_close_session(IpHost *iph, TcpSession *tcps);
+
+TcpSession *tcp_get_session(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort);
+TcpHeader *tcp_get_header(MacFrame *mf);
+
 #endif // _UMIP_IP_H_

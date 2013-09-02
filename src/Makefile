@@ -1,23 +1,28 @@
 
+#CC=arm-none-eabi-gcc
+#AR=arm-none-eabi-ar
+
 all: umip.elf
 
 TARGET := umip.elf
 
 INCLUDES := utap.h mac.h common.h arp.h ip.h tcp.h icmp.h
-LIBOBJS := main.o common.o utap.o mac.o arp.o ip.o tcp.o icmp.o
+LIBOBJS := common.o mac.o arp.o ip.o tcp.o icmp.o
+TAPOBJS := utap.o main.o
 LIBTARGET := umac.a
 
-CFLAGS += -fms-extensions -O0
+CFLAGS += -fms-extensions -O0 -ggdb
 
-$(TARGET): $(LIBTARGET)
-	$(CC) $(LDFLAGS) -ggdb -o $(TARGET) $(LIBTARGET)
+$(TARGET): $(LIBTARGET) $(TAPOBJS)
+	$(CC) $(LDFLAGS) -o $(TARGET) $(TAPOBJS) $(LIBTARGET)
 	cp $(TARGET) ..
+	strip -o ../$(TARGET).stripped $(TARGET)
 
 $(LIBTARGET): $(LIBOBJS)
-	ar cru $(LIBTARGET) $(LIBOBJS)
+	$(AR) cru $(LIBTARGET) $(LIBOBJS)
 
 %.o: %.c Makefile $(INCLUDES)
-	$(CC) $(CFLAGS) -c -ggdb $<
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	rm -f $(LIBOBJS) $(TARGET) $(LIBTARGET)
