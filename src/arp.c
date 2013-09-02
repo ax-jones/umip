@@ -20,6 +20,7 @@ uint8_t arp_handle_msg(ArpHandler *ah)
   ArpPacket *ap = (ArpPacket*)mac_frame_payload(&ah->mdev->recvFrame);
 
   if(ap->wOperation == HTONS(ARP_OP_REQUEST)) {
+    if(ap->destIpAddr != ah->local.addr) return 0;
     ArpPacket rep;
     rep.wHwType = HTONS(ARP_HWTYPE_ETHER);
     rep.wProtoType = HTONS(ARP_PROTOTYPE_IP4);

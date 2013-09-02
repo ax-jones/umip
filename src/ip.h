@@ -58,6 +58,8 @@ typedef struct {
 
 #define IPV4_ADDR_NULL 0x0;
 
+#define IPV4_ADDR(a,b,c,d) ((a << 24) | (b << 16) | (c << 8) | d)
+
 void iph_init(IpHost *iph, MacDevice *mdev);
 uint8_t iph_proc(IpHost *iph);
 uint8_t iph_handle_msg(IpHost *iph);

@@ -43,7 +43,7 @@ int main(int argc, char **argv)
   uint8_t macAddr[6] = { 0x24, 0x52, 0x81, 0x93, 0x19, 0x22 };
   mac_init(&mdev, macAddr);
   iph_init(&iph, &mdev);
-  iph_set_ip4addr(&iph, (10 << 24) | (5 << 16) | (1 << 8) | 1, 0xffffffff);
+  iph_set_ip4addr(&iph, IPV4_ADDR(10, 5, 1, 1), 0xffffffff);
 
   while(1) {
     nread = read(tapfd, pktbuff, TAP_BUFFER_SIZE);

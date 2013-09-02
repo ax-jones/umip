@@ -42,6 +42,8 @@ uint8_t iph_handle_msg(IpHost *iph)
 {
   IpHeader *iphead = iph_get_ip_header(&iph->mdev->recvFrame);
 
+  if(HTONL(iphead->destAddr) != iph->localAddr) return 0;
+
   switch(iphead->cProtocol) {
   case IP_PROTO_ICMP:
     return icmp_handle_msg(iph);
