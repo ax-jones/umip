@@ -80,12 +80,11 @@ IpHeader *iph_get_ip_header(MacFrame *mf);
 IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest);
 void iph_finish_frame(MacFrame *mf, IpHeader *iphead, uint16_t len);
 
-uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len);
+uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len, uint16_t start);
 
 uint8_t udp_handle_msg(IpHost *iph);
 
 typedef struct {
-  IpHeader ipHead;
   IpPort srcPort;
   IpPort destPort;
   uint32_t seqNumber;
@@ -97,6 +96,20 @@ typedef struct {
   uint16_t urgentPtr;
 } __attribute__((packed)) TcpHeader;
 
+typedef struct {
+  IpHeader ipHead;
+  TcpHeader tcpHead;
+} __attribute__((packed)) TcpFrame;
+
+typedef struct {
+  Ip4Addr srcAddr;
+  Ip4Addr destAddr;
+  uint8_t pad;
+  uint8_t protocol;
+  uint16_t tcpLen;
+  TcpHeader tcpHeader;
+} __attribute__((packed)) TcpCsum;
+
 #define TCP_FIN 0x01
 #define TCP_SYN 0x02
 #define TCP_RST 0x04
@@ -106,15 +119,15 @@ enum { tcpVoid, tcpListen, tcpSynSent, tcpSynReceived, tcpEstablished, tcpFinWai
 
 uint8_t tcp_handle_msg(IpHost *);
 
-TcpHeader *tcp_init_head(IpHost *iph, TcpSession *tcps, TcpHeader *tcph);
-void tcp_finish_frame(MacFrame *mf, TcpHeader *tcph, uint16_t len);
+TcpFrame *tcp_init_head(IpHost *iph, TcpSession *tcps);
 
-TcpSession *tcp_create_session(IpHost *iph, Ip4Addr destAddr, IpPort destPort);
+TcpSession *tcp_create_session(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort, IpPort localPort);
 void tcp_send_ack(IpHost *iph, TcpSession *tcps);
 void tcp_handle_frame(IpHost *iph, TcpHeader *tcph);
 void tcp_close_session(IpHost *iph, TcpSession *tcps);
 
 TcpSession *tcp_get_session(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort);
-TcpHeader *tcp_get_header(MacFrame *mf);
+TcpFrame *tcp_get_header(MacFrame *mf);
+void tcp_finish_frame(MacFrame *mf, TcpFrame *tcpf, uint16_t len);
 
 #endif // _UMIP_IP_H_

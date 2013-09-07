@@ -39,7 +39,7 @@ void icmp_finish_frame(MacFrame *mf, IcmpHeader *icmph, uint16_t len)
   uint8_t *hp = (uint8_t*) icmph;
 
   icmph->wChecksum = 0;
-  uint16_t csum = ip_calc_csum((uint16_t*) (hp+sizeof(IpHeader)), 8);
+  uint16_t csum = ip_calc_csum((uint16_t*) (hp+sizeof(IpHeader)), 8, 0);
   icmph->wChecksum = csum;
 
   dout("csum for icmp %hx %hu.\n", icmph->wChecksum, icmp_paylen(icmph));

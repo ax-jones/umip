@@ -96,18 +96,19 @@ void iph_finish_frame(MacFrame *mf, IpHeader *iphead, uint16_t len)
 
   uint8_t *ipp = (uint8_t*) iphead;
   ipp += sizeof(MacHeader);
-  iphead->wHdrChecksum = ip_calc_csum((uint16_t*)ipp, sizeof(IpHeader) - sizeof(MacHeader));
+  iphead->wHdrChecksum = ip_calc_csum((uint16_t*)ipp, sizeof(IpHeader) - sizeof(MacHeader), 0);
 
   mf->writePtr = len + sizeof(IpHeader);
 
   dout("checksum for iph %hx.\n", iphead->wHdrChecksum);
 }
 
-uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len)
+uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len, uint16_t start)
 {
-  uint32_t sum = 0;
+  uint32_t sum = start;
 
   while(len > 1) {
+    //sum += HTONS(*(ptr++));
     sum += *(ptr++);
     len -= 2;
   }

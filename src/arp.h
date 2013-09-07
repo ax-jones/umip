@@ -43,6 +43,7 @@ void arp_set_self(ArpHandler *, MacAddr, Ip4Addr);
 uint8_t arp_handle_msg(ArpHandler *);
 void arp_add_entry(ArpHandler *, MacAddr, Ip4Addr);
 uint8_t arp_get_addr(ArpHandler *, MacAddr, Ip4Addr);
+uint8_t arp_has_addr(ArpHandler *, Ip4Addr);
 void arp_send_request(ArpHandler *, Ip4Addr);
 
 #endif // _UMIP_ARP_H_

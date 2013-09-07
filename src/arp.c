@@ -37,6 +37,7 @@ uint8_t arp_handle_msg(ArpHandler *ah)
     mac_write_frame(&ah->mdev->sendFrame, (uint8_t*)&rep, sizeof(rep), 0);
 
     dout("Got an arp req from %02hhx%02hhx%02hhx%02hhx%02hhx%02hhx.\n", rep.srcAddr[0], rep.srcAddr[1], rep.srcAddr[2], rep.srcAddr[3], rep.srcAddr[4], rep.srcAddr[5]);
+    if(!arp_has_addr(ah, ap->srcIpAddr)) arp_add_entry(ah, ap->srcAddr, ap->srcIpAddr);
     return 1;
   } else if(ap->wOperation == HTONS(ARP_OP_REPLY)) {
     arp_add_entry(ah, ap->srcAddr, ap->srcIpAddr);
