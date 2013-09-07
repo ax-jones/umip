@@ -113,6 +113,7 @@ typedef struct {
 #define TCP_FIN 0x01
 #define TCP_SYN 0x02
 #define TCP_RST 0x04
+#define TCP_PSH 0x08
 #define TCP_ACK 0x10
 
 enum { tcpVoid, tcpListen, tcpSynSent, tcpSynReceived, tcpEstablished, tcpFinWait1, tcpFinWait2, tcpCloseWait, tcpClosing, tcpLastAck, tcpTimeWait, tcpClosed };
@@ -126,8 +127,10 @@ void tcp_send_ack(IpHost *iph, TcpSession *tcps);
 void tcp_handle_frame(IpHost *iph, TcpHeader *tcph);
 void tcp_close_session(IpHost *iph, TcpSession *tcps);
 
-TcpSession *tcp_get_session(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort);
+TcpSession *tcp_get_session(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort, IpPort localPort);
 TcpFrame *tcp_get_header(MacFrame *mf);
 void tcp_finish_frame(MacFrame *mf, TcpFrame *tcpf, uint16_t len);
+
+uint8_t *tcp_get_payload(TcpFrame *tcpf);
 
 #endif // _UMIP_IP_H_
