@@ -12,7 +12,7 @@ uint8_t tcp_handle_msg(IpHost *iph)
     dout("new connection from %hhx %08x %i to %i.\n", tcprh->tcpFlags, HTONL(tcprf->ipHead.srcAddr), HTONS(tcprh->srcPort), HTONS(tcprh->destPort));
     TcpSession *tcps = tcp_create_session(iph, tcprf->ipHead.srcAddr, tcprh->srcPort, tcprh->destPort);
 
-    tcps->remoteSeqNumber = HTONL(tcprh->seqNumber);
+    tcps->remoteSeqNumber = HTONL(tcprh->seqNumber) + 1;
 
     TcpFrame *tcpsf = tcp_init_head(iph, tcps);
     TcpHeader *tcpsh = &tcpsf->tcpHead;
