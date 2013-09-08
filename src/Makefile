@@ -1,6 +1,9 @@
 
-#CC=arm-none-eabi-gcc
-#AR=arm-none-eabi-ar
+CC=arm-none-eabi-gcc
+AR=arm-none-eabi-ar
+
+CDEFINES += -DBIG_ENDIAN
+#CDEFINES += -DLINUX -DLITTLE_ENDIAN
 
 INCLUDES := utap.h mac.h common.h arp.h ip.h tcp.h icmp.h
 LIBOBJS := common.o mac.o arp.o ip.o tcp.o icmp.o
@@ -9,7 +12,7 @@ LIBTARGET := umac.a
 
 TARGET := umip.elf
 
-all: $(TARGET)
+all: $(LIBTARGET)
 
 CFLAGS += -fms-extensions -O0 -ggdb
 

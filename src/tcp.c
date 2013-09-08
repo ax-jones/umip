@@ -85,8 +85,8 @@ void tcp_finish_frame(MacFrame *mf, TcpFrame *tcpf, uint16_t len)
   tcpsum.protocol = 6;
   tcpsum.tcpLen = HTONS(len + sizeof(TcpHeader));
 
-  uint16_t csum = ip_calc_csum((uint16_t*)&tcpsum, sizeof(TcpCsum), 0);
-  if(len) csum = ip_calc_csum(tcp_get_payload(tcpf), len, ~csum);
+  uint16_t csum = ip_calc_csum((uint16_t*) &tcpsum, sizeof(TcpCsum), 0);
+  if(len) csum = ip_calc_csum((uint16_t*) tcp_get_payload(tcpf), len, csum);
   tcpf->tcpHead.tcpChecksum = csum;
   iph_finish_frame(mf, &tcpf->ipHead, len + sizeof(TcpHeader));
   dout("tcp csum %hx.\n", csum);

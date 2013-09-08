@@ -105,10 +105,9 @@ void iph_finish_frame(MacFrame *mf, IpHeader *iphead, uint16_t len)
 
 uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len, uint16_t start)
 {
-  uint32_t sum = start;
+  uint32_t sum = (start ? ~start : 0);
 
   while(len > 1) {
-    //sum += HTONS(*(ptr++));
     sum += *(ptr++);
     len -= 2;
   }

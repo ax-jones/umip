@@ -17,7 +17,6 @@ void _memset(uint8_t *dest, uint8_t b, uint16_t len)
 {
   while(len--) *(dest++) = b;
 }
-
 uint16_t _strlen(const char *str)
 {
   uint16_t l = 0;
