@@ -14,12 +14,12 @@ void mac_init(MacDevice *mdev, uint8_t *addr)
   _memcpy(mac_frame_header(&mdev->sendFrame)->srcAddr, addr, MAC_ADDR_LEN);
 }
 
-void mac_write_frame(MacFrame *mf, uint8_t *packet, uint16_t len, uint8_t raw)
+void mac_write_frame(MacFrame *mf, const uint8_t *packet, uint16_t len, uint8_t raw)
 {
   uint8_t *wptr = mf->packet + mf->writePtr;
   len += mf->writePtr;
 
-  while(mf->writePtr++ < len) *(wptr++) = *(packet++);
+  while(mf->writePtr < len) { *(wptr++) = *(packet++); mf->writePtr++; }
 }
 
 void mac_send_frame(MacFrame *mf)
@@ -31,7 +31,7 @@ void mac_read_frame(MacFrame *mf, uint8_t *packet, uint16_t len, uint8_t raw)
   uint8_t *rptr = raw ? mf->packet : mac_frame_payload(mf);
   len += mf->readPtr + (raw ? 0 : sizeof(MacHeader));
 
-  while(mf->readPtr++ < len) *(packet++) = *(rptr);
+  while(mf->readPtr < len) { *(packet++) = *(rptr); mf->readPtr++; }
 }
 
 void mac_clear_frame(MacFrame *mf)

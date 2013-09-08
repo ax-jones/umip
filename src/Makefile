@@ -2,10 +2,11 @@
 CC=arm-none-eabi-gcc
 AR=arm-none-eabi-ar
 
-CDEFINES += -DBIG_ENDIAN
+CDEFINES += -DLITTLE_ENDIAN
+CFLAGS += -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
 #CDEFINES += -DLINUX -DLITTLE_ENDIAN
 
-INCLUDES := utap.h mac.h common.h arp.h ip.h tcp.h icmp.h
+INCLUDES := ../include/utap.h ../include/mac.h ../include/common.h ../include/arp.h ../include/ip.h ../include/tcp.h ../include/icmp.h
 LIBOBJS := common.o mac.o arp.o ip.o tcp.o icmp.o
 TAPOBJS := utap.o main.o
 LIBTARGET := umac.a
@@ -14,7 +15,7 @@ TARGET := umip.elf
 
 all: $(LIBTARGET)
 
-CFLAGS += -fms-extensions -O0 -ggdb
+CFLAGS += -fms-extensions -O0 -ggdb -I../include
 
 $(TARGET): $(LIBTARGET) $(TAPOBJS)
 	$(CC) $(LDFLAGS) -o $(TARGET) $(TAPOBJS) $(LIBTARGET)

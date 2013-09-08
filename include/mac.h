@@ -38,7 +38,7 @@ typedef struct {
 
 void mac_init(MacDevice *mac, uint8_t *addr);
 
-void mac_write_frame(MacFrame *mf, uint8_t *packet, uint16_t len, uint8_t raw);
+void mac_write_frame(MacFrame *mf, const uint8_t *packet, uint16_t len, uint8_t raw);
 void mac_send_frame(MacFrame *);
 void mac_read_frame(MacFrame *mf, uint8_t *packet, uint16_t len, uint8_t raw);
 void mac_get_frame(MacFrame *);
