@@ -123,3 +123,51 @@ uint8_t udp_handle_msg(IpHost *iph)
   dout("udp msg received.\n");
   return 0;
 }
+
+UdpFrame *udp_init_head(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort, IpPort localPort)
+{
+  UdpFrame *udpf = (UdpFrame*) iph_init_head(iph, remoteAddr);
+
+  if(udpf) {
+    udpf->udpHead.wSrcPort = HTONS(localPort);
+    udpf->udpHead.wDestPort = HTONS(remotePort);
+    udpf->udpHead.wChecksum = 0;
+    udpf->ipHead.cProtocol = IP_PROTO_UDP;
+  }
+
+  return udpf;
+}
+
+void udp_finish_frame(MacFrame *mf, UdpFrame *udpf, uint16_t len)
+{
+  UdpCsum udpsum;
+
+  udpf->udpHead.wLength = NTOHS(len + sizeof(UdpHeader));
+  udpsum.srcAddr = udpf->ipHead.srcAddr;
+  udpsum.destAddr = udpf->ipHead.destAddr;
+  udpsum.zeros = 0;
+  udpsum.protocol = IP_PROTO_UDP;
+  udpsum.len = udpf->udpHead.wLength;
+  udpsum.udpHead = udpf->udpHead;
+
+  uint16_t csum = ip_calc_csum((uint16_t*)&udpsum, sizeof(UdpCsum), 0);
+  if(len) csum = ip_calc_csum((uint16_t*) udp_get_payload(udpf), len, ~csum);
+  udpf->udpHead.wChecksum = csum;
+  iph_finish_frame(mf, &udpf->ipHead, len + sizeof(UdpHeader));
+}
+
+uint8_t *udp_get_payload(UdpFrame *udpf)
+{
+  return ((uint8_t*)udpf) + sizeof(UdpFrame);
+}
+
+void udp_send_datagram(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort, IpPort localPort, uint8_t *data, uint16_t len)
+{
+  UdpFrame *udpf = udp_init_head(iph, remoteAddr, remotePort, localPort);
+
+  if(udpf) {
+    if(len) _memcpy(udp_get_payload(udpf), data, len);
+
+    udp_finish_frame(&iph->mdev->sendFrame, udpf, len);
+  }
+}

@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <linux/if.h>
 #include <linux/if_tun.h>
+#include <time.h>
 #include "utap.h"
 #include "icmp.h"
 
@@ -24,6 +25,7 @@ int main(int argc, char **argv)
   MacDevice mdev;
   IpHost iph;
   char ifname[IFNAMSIZ], pktbuff[TAP_BUFFER_SIZE], pktlabel[16], outbuff[TAP_BUFFER_SIZE];
+  uint64_t t = time(NULL);
 
   ifname[0] = '\0';
 
@@ -65,6 +67,12 @@ int main(int argc, char **argv)
       //memcpy(outbuff, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
       write(tapfd, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
       mac_clear_frame(&mdev.sendFrame);
+    }
+    if(time(NULL) > t) {
+      t = time(NULL);
+      mac_clear_frame(&mdev.sendFrame);
+      udp_send_datagram(&iph, NTOHL(IPV4_ADDR(10, 5, 1, 2)), 8055, 8055, "lalala\n", 7);
+      write(tapfd, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
     }
     if(outfd > 0) {
       snprintf(pktlabel, 16, "\n%i:\n", mac_payload_len(&mdev.recvFrame));

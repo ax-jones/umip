@@ -2,7 +2,7 @@
 #ifndef _UMIP_COMMON_H_
 #define _UMIP_COMMON_H_
 
-#ifndef LITTLE_ENDIAN
+#ifdef LITTLE_ENDIAN
 #define HTONS(x) (((0xff & x) << 8) | (x >> 8))
 #define NTOHS(x) (((0xff & x) << 8) | (x >> 8))
 #define HTONL(x) (HTONS(x >> 16) | (HTONS((x & 0xffff)) << 16))
