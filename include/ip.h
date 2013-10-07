@@ -39,14 +39,25 @@ typedef struct {
 void ip_init_hdr(IpHeader *iph, uint8_t protocol, Ip4Addr srcAddr, Ip4Addr destAddr);
 
 typedef struct {
-IpHeader;
 IpPort wSrcPort;
 IpPort wDestPort;
 uint16_t wLength;
 uint16_t wChecksum;
 } __attribute__((packed)) UdpHeader;
 
-void udp_init_hdr(UdpHeader *uph, Ip4Addr srcAddr, IpPort srcPort, Ip4Addr destAddr, IpPort destPort);
+typedef struct {
+  Ip4Addr srcAddr;
+  Ip4Addr destAddr;
+  uint8_t zeros;
+  uint8_t protocol;
+  uint16_t len;
+  UdpHeader udpHead;
+} __attribute__((packed)) UdpCsum;
+
+typedef struct {
+  IpHeader ipHead;
+  UdpHeader udpHead;
+} __attribute__((packed)) UdpFrame;
 
 typedef struct {
   Ip4Addr remoteAddr;
@@ -83,6 +94,11 @@ void iph_finish_frame(MacFrame *mf, IpHeader *iphead, uint16_t len);
 uint16_t ip_calc_csum(uint16_t *ptr, uint16_t len, uint16_t start);
 
 uint8_t udp_handle_msg(IpHost *iph);
+UdpFrame *udp_init_head(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort, IpPort localPort);
+void udp_finish_frame(MacFrame *mf, UdpFrame *udpf, uint16_t len);
+uint8_t *udp_get_payload(UdpFrame *udpf);
+
+void udp_send_datagram(IpHost *iph, Ip4Addr remoteAddr, IpPort remotePort, IpPort localPort, uint8_t *data, uint16_t len);
 
 typedef struct {
   IpPort srcPort;
