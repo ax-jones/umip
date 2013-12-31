@@ -6,6 +6,7 @@
 uint8_t icmp_handle_msg(IpHost *iph)
 {
   IcmpHeader *ihead = icmp_get_header(&iph->mdev->recvFrame);
+  int i, j;
 
   if(ihead->cType == icmpEchoRequest) {
     if(!arp_has_addr(&iph->arph, ihead->ipHead.srcAddr)) {
@@ -20,8 +21,8 @@ uint8_t icmp_handle_msg(IpHost *iph)
     shead->ipHead.cTTL = ihead->ipHead.cTTL;
 
     dout("icmp msg %hu.\n", icmp_paylen(ihead));
-
     _memcpy(icmp_payload(shead), icmp_payload(ihead), icmp_paylen(ihead));
+
     icmp_finish_frame(&iph->mdev->sendFrame, shead, icmp_paylen(ihead) + 8);
     return 1;
   }
@@ -54,5 +55,5 @@ uint8_t *icmp_payload(IcmpHeader *icmph)
 
 uint16_t icmp_paylen(IcmpHeader *icmph)
 {
-  return (HTONS(icmph->ipHead.wTotalLen) + sizeof(MacHeader)) - sizeof(IcmpHeader);
+  return (HTONS(icmph->ipHead.wTotalLen) - sizeof(IcmpHeader)) + sizeof(MacHeader);
 }

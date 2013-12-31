@@ -71,7 +71,7 @@ typedef struct {
 typedef struct {
   Ip4Addr localAddr;
   Ip4Addr gatewayAddr;
-  uint8_t netmask;
+  uint32_t netmask;
   MacDevice *mdev;
   ArpHandler arph;
   TcpSession tcpSessions[8];
@@ -86,6 +86,7 @@ void iph_init(IpHost *iph, MacDevice *mdev);
 uint8_t iph_proc(IpHost *iph);
 uint8_t iph_handle_msg(IpHost *iph);
 void iph_set_ip4addr(IpHost *, Ip4Addr localAddr, Ip4Addr netmask);
+void iph_set_gateway(IpHost *, Ip4Addr gwAddr);
 
 IpHeader *iph_get_ip_header(MacFrame *mf);
 IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest);

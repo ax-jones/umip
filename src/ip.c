@@ -8,7 +8,7 @@ void iph_init(IpHost *iph, MacDevice *mdev)
   iph->mdev = mdev;
   iph->localAddr = IPV4_ADDR_NULL;
   iph->gatewayAddr = IPV4_ADDR_NULL;
-  iph->netmask = 32;
+  iph->netmask = 0xffffffff;
   iph->nSessions = 0;
   uint8_t i = 0;
   while(i < 8) iph->tcpSessions[i++].sessionState = tcpVoid;
@@ -41,11 +41,19 @@ void iph_set_ip4addr(IpHost *iph, Ip4Addr addr, Ip4Addr netmask)
   arp_set_self(&iph->arph, iph->mdev->localAddr, addr);
 }
 
+void iph_set_gateway(IpHost *iph, Ip4Addr gwAddr)
+{
+  iph->gatewayAddr = gwAddr;
+}
+
 uint8_t iph_handle_msg(IpHost *iph)
 {
   IpHeader *iphead = iph_get_ip_header(&iph->mdev->recvFrame);
 
-  if(HTONL(iphead->destAddr) != iph->localAddr) return 0;
+  if(HTONL(iphead->destAddr) != iph->localAddr) {
+    dout("Not for us, for this guy: %x %x.\n", HTONL(iphead->destAddr), iph->localAddr);
+    return 0;
+  }
 
   switch(iphead->cProtocol) {
   case IP_PROTO_ICMP:
@@ -68,11 +76,16 @@ IpHeader *iph_get_ip_header(MacFrame *mf)
 IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest)
 {
   IpHeader *iphead = iph_get_ip_header(&iph->mdev->sendFrame);
-
   MacAddr destMac;
+  Ip4Addr nextHop;
 
-  if(!arp_get_addr(&iph->arph, destMac, dest)) {
-    dout("Can't find mac for %x.\n", dest);
+  if((dest & iph->netmask) != (iph->localAddr & iph->netmask)) 
+    nextHop = iph->gatewayAddr;
+  else
+    nextHop = dest;
+
+  if(!arp_get_addr(&iph->arph, destMac, nextHop)) {
+    dout("Can't find mac for %x.\n", nextHop);
     return NULL;
   }
 

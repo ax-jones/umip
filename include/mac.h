@@ -23,8 +23,11 @@ typedef struct {
 #define MAC_FRAME_TYPE_ARP 0x0806
 #define MAC_FRAME_TYPE_IP6 0x86dd
 
+#define MAC_FRAME_UNOWNED 0x80
+#define MAC_FRAME_PRESENT 0x01
+
 typedef struct {
-  uint8_t packet[PACKET_LEN];
+  uint8_t *packet;//[PACKET_LEN];
   uint16_t writePtr, readPtr;
   uint8_t flags;
 } __attribute__((packed)) MacFrame;
@@ -45,6 +48,7 @@ void mac_get_frame(MacFrame *);
 void mac_clear_frame(MacFrame *);
 void mac_init_frame(MacDevice *md, MacAddr dest, uint16_t proto);
 void mac_init_frame_bcast(MacDevice *md, uint16_t proto);
+void mac_set_frame(MacFrame *, uint8_t *packet, uint16_t len);
 
 #define FRAME_FILLING  0x01
 #define FRAME_EMPTY    0x02

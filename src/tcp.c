@@ -14,6 +14,8 @@ uint8_t tcp_handle_msg(IpHost *iph)
     dout("new connection from %hhx %08x %i to %i.\n", tcprh->tcpFlags, HTONL(tcprf->ipHead.srcAddr), HTONS(tcprh->srcPort), HTONS(tcprh->destPort));
     TcpSession *tcps = tcp_create_session(iph, tcprf->ipHead.srcAddr, tcprh->srcPort, tcprh->destPort);
 
+    if(!arp_has_addr(&iph->arph, tcprf->ipHead.srcAddr))
+      arp_add_entry(&iph->arph, tcprf->ipHead.mac.srcAddr, tcprf->ipHead.srcAddr);
     tcps->remoteSeqNumber = HTONL(tcprh->seqNumber) + 1;
 
     TcpFrame *tcpsf = tcp_init_head(iph, tcps);
@@ -38,12 +40,20 @@ uint8_t tcp_handle_msg(IpHost *iph)
     return 1;
   }
 
+  dout("tcp-wtf? %x %x %i %i\n", tcprh->tcpFlags, HTONL(tcprf->ipHead.srcAddr), HTONS(tcprh->srcPort), HTONS(tcprh->destPort));
+#if 1
+  uint8_t *prbuf = iph->mdev->recvFrame.packet;
+  int len = iph->mdev->recvFrame.writePtr, i;
+    for(i = 0; i < len; i++) {
+      dout("%02hhx ", *(prbuf++));
+    }
+#endif
   return 0;
 }
 
 TcpFrame *tcp_get_header(MacFrame *mf)
 {
-  return (TcpFrame *)&mf->packet;
+  return (TcpFrame *)mf->packet;
 }
 
 TcpFrame *tcp_init_head(IpHost *iph, TcpSession *tcps)

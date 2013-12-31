@@ -22,7 +22,11 @@ uint16_t _strlen(const char *);
 #ifdef LINUX
 #define dout(...) fprintf(stderr, __VA_ARGS__)
 #else
-#define dout(...) ;
+#if 1
+#define dout(...) printf(__VA_ARGS__)
+#else
+#define dout(...)
+#endif
 #endif
 
 #endif // _UMIP_COMMON_H_
