@@ -1,0 +1,24 @@
+
+UMIP - either User Mode IP stack or Microcontroller IP stack
+
+Very limited ip stack for microcontrollers, embedded platforms, but can also be used via linux TAP interface.
+
+Needs much more work, is currently designed for minimal resource usage. TCP support is very limited, and does not conform to standard, particularly wrt RST and socket close.
+
+The priority up to now has been ensuring it works with very small microcontrollers (have a USB-ECE app for the STM32F4 using libopencm3 that needs to be committed), but most protocol testing was done using the usermode linux application.
+
+To run as tap interface:
+
+make
+sudo ./umip.elf
+sudo ifconfig <tap interface name> 10.5.1.2 netmask 255.255.255.0
+
+ping 10.5.1.1 (should respond)
+curl 10.5.1.1 (should get a brief message)
+
+Next phase involves adding routing and other features.
+
+BADLY NEEDED:
+
+DNS support
+DHCP support

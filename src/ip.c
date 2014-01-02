@@ -79,7 +79,7 @@ IpHeader *iph_init_head(IpHost *iph, Ip4Addr dest)
   MacAddr destMac;
   Ip4Addr nextHop;
 
-  if((dest & iph->netmask) != (iph->localAddr & iph->netmask)) 
+  if((dest & iph->netmask) != (iph->localAddr & iph->netmask) && iph->gatewayAddr) 
     nextHop = iph->gatewayAddr;
   else
     nextHop = dest;

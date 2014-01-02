@@ -43,9 +43,12 @@ int main(int argc, char **argv)
   }
 
   uint8_t macAddr[6] = { 0x24, 0x52, 0x81, 0x93, 0x19, 0x22 };
+
+  //mac_set_frame(&mdev.recvFrame, pktbuff, 0);
+  mac_set_frame(&mdev.sendFrame, outbuff, 0);
   mac_init(&mdev, macAddr);
   iph_init(&iph, &mdev);
-  iph_set_ip4addr(&iph, IPV4_ADDR(10, 5, 1, 1), 0xffffffff);
+  iph_set_ip4addr(&iph, IPV4_ADDR(10, 5, 1, 1), 0xffffff);
 
   while(1) {
     nread = read(tapfd, pktbuff, TAP_BUFFER_SIZE);
@@ -55,7 +58,8 @@ int main(int argc, char **argv)
       exit(-1);
     }
     mac_clear_frame(&mdev.recvFrame);
-    mac_write_frame(&mdev.recvFrame, pktbuff, nread, 1);
+    mac_set_frame(&mdev.recvFrame, pktbuff, nread);
+    //mac_write_frame(&mdev.recvFrame, pktbuff, nread, 1);
 
     uint8_t *ra = mac_frame_header(&mdev.recvFrame)->srcAddr;
     printf("Pkt %i read from 0x%hhx%hhx%hhx%hhx%hhx%hhx %hx 0x%02hhx%02hhx%02hhx%02hhx.\n", mac_payload_len(&mdev.recvFrame), ra[0], ra[1], ra[2], ra[3], ra[4], ra[5], NTOHS(mac_frame_header(&mdev.recvFrame)->wType), pktbuff[0], pktbuff[1], pktbuff[2], pktbuff[3]);
@@ -68,12 +72,12 @@ int main(int argc, char **argv)
       write(tapfd, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
       mac_clear_frame(&mdev.sendFrame);
     }
-    if(time(NULL) > t) {
+    /*if(time(NULL) > t) {
       t = time(NULL);
       mac_clear_frame(&mdev.sendFrame);
       udp_send_datagram(&iph, NTOHL(IPV4_ADDR(10, 5, 1, 2)), 8055, 8055, "lalala\n", 7);
       write(tapfd, mdev.sendFrame.packet, mdev.sendFrame.writePtr);
-    }
+    }*/
     if(outfd > 0) {
       snprintf(pktlabel, 16, "\n%i:\n", mac_payload_len(&mdev.recvFrame));
       //write(outfd, pktlabel, strlen(pktlabel));
